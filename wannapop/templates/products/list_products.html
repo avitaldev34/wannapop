@@ -3,7 +3,13 @@
 <h2>Lista de Productos</h2>
 <ul>
     {% for p in products %}
-        <li>{{ p }}</li>
+    <li>
+    <li>
+        <a href="{{ url_for('products.read_product', product_id=product.id) }}">
+            {{ product.title }} - {{ product.price }} €
+        </a>
+    </li>
+    </li>
     {% endfor %}
 </ul>
 {% endblock %}

@@ -4,8 +4,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 from config import Config
 import logging
 from logging.handlers import RotatingFileHandler
-
-
+from .models import db
 
 db = SQLAlchemy()
 toolbar = DebugToolbarExtension()
@@ -21,7 +20,7 @@ def create_app():
     if app.config["DEBUG_TB_ENABLED"]:
         toolbar.init_app(app)
 
-        # --- Configuració de logging ---
+    # --- Configuració de logging ---
     log_handler = RotatingFileHandler('app.log', maxBytes=10240, backupCount=3)
     log_handler.setFormatter(logging.Formatter(
         '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'

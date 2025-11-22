@@ -1,0 +1,19 @@
+CREATE TABLE users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL UNIQUE,
+    email TEXT NOT NULL UNIQUE,
+    password TEXT NOT NULL,
+    avatar TEXT,
+    created DATETIME NOT NULL DEFAULT (DATETIME('now')),
+    updated DATETIME NOT NULL DEFAULT (DATETIME('now'))
+);
+
+CREATE TABLE products (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    description TEXT NOT NULL,
+    photo TEXT,
+    price DECIMAL(10, 2) NOT NULL,
+    created DATETIME NOT NULL DEFAULT (DATETIME('now')),
+    updated DATETIME NOT NULL DEFAULT (DATETIME('now'))
+);

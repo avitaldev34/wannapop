@@ -1,6 +1,9 @@
 {% extends "layout/_base.html" %}
 {% block content %}
-<h2>Detalle de Producto</h2>
+<h1>Detalls producte</h1>
 <p>ID: {{ product.id }}</p>
-<p>Nombre: {{ product.name }}</p>
+<p>Títol: {{ product.title }}</p>
+<p>Descripció: {{ product.description }}</p>
+<p>Preu: {{ product.price }} €</p>
+
 {% endblock %}
