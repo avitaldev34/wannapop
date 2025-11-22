@@ -5,7 +5,7 @@ from wannapop.models import User
 bp = Blueprint("users", __name__, url_prefix="/users")
 logger = logging.getLogger(__name__)
 
-# Ruta: /users/
+# Ruta: /users/list
 @bp.route("/list")
 def list_users():
     # Consulta todos los usuarios de la BD
@@ -13,8 +13,8 @@ def list_users():
     logger.debug(f"Se han recuperado {len(users)} usuarios de la BD")
     return render_template("users/list_users.html", users=users)
 
-# Ruta: /users/<id>
-@bp.route("/read<int:user_id>")
+# Ruta: /users/read/<id>
+@bp.route("/read/<int:user_id>")
 def read_user(user_id):
     # Busca un usuario por su ID
     user = User.query.get(user_id)
