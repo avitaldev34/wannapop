@@ -5,3 +5,7 @@ class Config:
     SQLALCHEMY_DATABASE_URI = "sqlite:///sqlite/database.db"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     DEBUG_TB_INTERCEPT_REDIRECTS = False
+    DEBUG_TB_ENABLED = os.getenv("DEBUG_TB_ENABLED", "False") == "True"
+
+    # Nivell de registre
+    LOG_LEVEL = os.getenv("LOG_LEVEL", "DEBUG").upper()
