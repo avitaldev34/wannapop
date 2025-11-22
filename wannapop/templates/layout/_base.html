@@ -1,20 +1,23 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="ca">
 <head>
-    <meta charset="UTF-8">
-    <title>Wannapop</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <meta charset="UTF-8">
+  <title>Wannapop</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <header>
-        <h1>Wannapop</h1>
-        <nav>
-            <a href="{{ url_for('users.list_users') }}">Usuarios</a> |
-            <a href="{{ url_for('products.list_products') }}">Productos</a>
-        </nav>
-    </header>
-    <main>
-        {% block content %}{% endblock %}
-    </main>
+  <header>
+    <h1>Wannapop</h1>
+    <nav>
+      <a href="{{ url_for('users.list_users') }}">Usuaris</a>
+      <a href="{{ url_for('products.list_products') }}">Productes</a>
+    </nav>
+  </header>
+
+  {% block content %}{% endblock %}
+
+  <footer>
+    © 2025 Wannapop — by aviTalDev
+  </footer>
 </body>
 </html>

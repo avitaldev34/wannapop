@@ -1,7 +1,13 @@
 {% extends "layout/_base.html" %}
 {% block content %}
-<h1>Detalls usuari</h1>
-<p>ID: {{ user.id }}</p>
-<p>Nom: {{ user.name }}</p>
-<p>Email: {{ user.email }}</p>
+<div class="container">
+  <div class="card">
+    <h2>Detalls Usuari</h2>
+    <img src="{{ url_for('static', filename='uploads/' ~ (user.avatar or 'user_default.png')) }}" alt="Avatar de {{ user.name }}">
+    <p><strong>Nom:</strong> {{ user.name }}</p>
+    <p><strong>Email:</strong> {{ user.email }}</p>
+    <a class="action" href="{{ url_for('users.update_user', user_id=user.id) }}">📝 Editar</a>
+    <a class="action" href="{{ url_for('users.delete_user', user_id=user.id) }}" style="background-color: var(--danger)">🗑️ Eliminar</a>
+  </div>
+</div>
 {% endblock %}

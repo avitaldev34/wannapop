@@ -1,0 +1,11 @@
+{% extends "layout/_base.html" %}
+{% block content %}
+<div class="container">
+  <div class="card" style="text-align: center;">
+    <h2>Benvingut a <span style="color: var(--accent)">Wannapop</span></h2>
+    <p>Explora els usuaris i productes disponibles.</p>
+    <a class="action" href="{{ url_for('users.list_users') }}">👥 Usuaris</a>
+    <a class="action" href="{{ url_for('products.list_products') }}">📦 Productes</a>
+  </div>
+</div>
+{% endblock %}

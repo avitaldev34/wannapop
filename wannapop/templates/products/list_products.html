@@ -1,15 +1,21 @@
 {% extends "layout/_base.html" %}
 {% block content %}
-<h2>Lista de Productos</h2>
-<ul>
-    {% for p in products %}
-    <li>
-    <li>
-        <a href="{{ url_for('products.read_product', product_id=product.id) }}">
-            {{ product.title }} - {{ product.price }} €
-        </a>
-    </li>
-    </li>
+<div class="container">
+  <h2>Llista de Productes</h2>
+  <a class="action" href="{{ url_for('products.create_product') }}">➕ Crear Producte</a>
+
+  <div class="grid">
+    {% for product in products %}
+      <div class="card">
+        <img src="{{ url_for('static', filename='uploads/' ~ (product.photo or 'product_default.png')) }}" alt="Foto de {{ product.title }}">
+        <h3>{{ product.title }}</h3>
+        <p>{{ product.description }}</p>
+        <p><strong>Preu:</strong> {{ product.price }} €</p>
+        <a class="action" href="{{ url_for('products.read_product', product_id=product.id) }}">👁️ Veure</a>
+        <a class="action" href="{{ url_for('products.update_product', product_id=product.id) }}">📝 Editar</a>
+        <a class="action" href="{{ url_for('products.delete_product', product_id=product.id) }}" style="background-color: var(--danger)">🗑️ Eliminar</a>
+      </div>
     {% endfor %}
-</ul>
+  </div>
+</div>
 {% endblock %}

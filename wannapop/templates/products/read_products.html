@@ -1,9 +1,20 @@
 {% extends "layout/_base.html" %}
 {% block content %}
-<h1>Detalls producte</h1>
-<p>ID: {{ product.id }}</p>
-<p>Títol: {{ product.title }}</p>
-<p>Descripció: {{ product.description }}</p>
-<p>Preu: {{ product.price }} €</p>
+<div class="container">
+  <div class="card">
+    <h2>Detalls del Producte</h2>
 
+    <img src="{{ url_for('static', filename='uploads/' ~ (product.photo or 'product_default.png')) }}" 
+         alt="Foto de {{ product.title }}">
+
+    <p><strong>Títol:</strong> {{ product.title }}</p>
+    <p><strong>Descripció:</strong> {{ product.description }}</p>
+    <p><strong>Preu:</strong> {{ product.price }} €</p>
+
+    <div>
+      <a class="action" href="{{ url_for('products.update_product', product_id=product.id) }}">📝 Editar</a>
+      <a class="action" href="{{ url_for('products.delete_product', product_id=product.id) }}" style="background-color: var(--danger)">🗑️ Eliminar</a>
+    </div>
+  </div>
+</div>
 {% endblock %}

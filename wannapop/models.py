@@ -1,6 +1,4 @@
-from flask_sqlalchemy import SQLAlchemy
-
-db = SQLAlchemy()
+from .extensions import db
 
 class User(db.Model):
     __tablename__ = "users"
@@ -12,7 +10,6 @@ class User(db.Model):
     created = db.Column(db.DateTime, default=db.func.now())
     updated = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
 
-    # Relación con productos (como vendedor)
     products = db.relationship("Product", backref="seller", lazy=True)
 
 class Product(db.Model):
@@ -25,5 +22,4 @@ class Product(db.Model):
     created = db.Column(db.DateTime, default=db.func.now())
     updated = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
 
-    # Clave foránea al vendedor
     seller_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)

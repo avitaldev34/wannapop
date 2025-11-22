@@ -7,7 +7,7 @@ bp = Blueprint("main", __name__)
 @bp.route("/")
 def index():
     # Renderiza la plantilla base o la página de inicio
-    return render_template("layout/_base.html")
+    return render_template("index.html")
 
 # Ruta de prueba "/hello"
 @bp.route("/hello")

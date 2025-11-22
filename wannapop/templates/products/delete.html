@@ -1,0 +1,10 @@
+{% extends "layout/_base.html" %}
+{% block content %}
+<h1>Eliminar Producte</h1>
+<p>Estàs segur que vols eliminar el producte {{ product.title }}?</p>
+
+<form method="POST">
+    <button type="submit">Confirmar eliminació</button>
+    <a href="{{ url_for('products.list_products') }}">Cancel·lar</a>
+</form>
+{% endblock %}
