@@ -2,7 +2,9 @@
 {% block content %}
 <div class="container">
   <h2>Llista d'Usuaris</h2>
-  <a class="action" href="{{ url_for('users.create_user') }}">➕ Crear Usuari</a>
+  <div class="actions">
+    <a class="action" href="{{ url_for('users.create_user') }}">➕ Crear Usuari</a>
+  </div>
 
   <div class="grid">
     {% for user in users %}
@@ -10,9 +12,11 @@
         <img src="{{ url_for('static', filename='uploads/' ~ (user.avatar or 'user_default.png')) }}" alt="Avatar de {{ user.name }}">
         <h3>{{ user.name }}</h3>
         <p>{{ user.email }}</p>
-        <a class="action" href="{{ url_for('users.read_user', user_id=user.id) }}">👁️ Veure</a>
-        <a class="action" href="{{ url_for('users.update_user', user_id=user.id) }}">📝 Editar</a>
-        <a class="action" href="{{ url_for('users.delete_user', user_id=user.id) }}" style="background-color: var(--danger)">🗑️ Eliminar</a>
+        <div class="actions">
+          <a class="action" href="{{ url_for('users.read_user', user_id=user.id) }}">👁️ Veure</a>
+          <a class="action" href="{{ url_for('users.update_user', user_id=user.id) }}">📝 Editar</a>
+          <a class="action" href="{{ url_for('users.delete_user', user_id=user.id) }}" style="background-color: var(--danger)">🗑️ Eliminar</a>
+        </div>
       </div>
     {% endfor %}
   </div>

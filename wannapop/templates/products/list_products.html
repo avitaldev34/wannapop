@@ -2,7 +2,9 @@
 {% block content %}
 <div class="container">
   <h2>Llista de Productes</h2>
-  <a class="action" href="{{ url_for('products.create_product') }}">➕ Crear Producte</a>
+  <div class="actions">
+    <a class="action" href="{{ url_for('products.create_product') }}">➕ Crear Producte</a>
+  </div>
 
   <div class="grid">
     {% for product in products %}
@@ -11,9 +13,11 @@
         <h3>{{ product.title }}</h3>
         <p>{{ product.description }}</p>
         <p><strong>Preu:</strong> {{ product.price }} €</p>
-        <a class="action" href="{{ url_for('products.read_product', product_id=product.id) }}">👁️ Veure</a>
-        <a class="action" href="{{ url_for('products.update_product', product_id=product.id) }}">📝 Editar</a>
-        <a class="action" href="{{ url_for('products.delete_product', product_id=product.id) }}" style="background-color: var(--danger)">🗑️ Eliminar</a>
+        <div class="actions">
+          <a class="action" href="{{ url_for('products.read_product', product_id=product.id) }}">👁️ Veure</a>
+          <a class="action" href="{{ url_for('products.update_product', product_id=product.id) }}">📝 Editar</a>
+          <a class="action" href="{{ url_for('products.delete_product', product_id=product.id) }}" style="background-color: var(--danger)">🗑️ Eliminar</a>
+        </div>
       </div>
     {% endfor %}
   </div>

@@ -1,0 +1,20 @@
+{% extends "layout/_base.html" %}
+{% block content %}
+<div class="container">
+  <h2>Registre d'Usuari</h2>
+
+  <!-- Formulari de registre amb WTForms -->
+  <form method="POST" enctype="multipart/form-data">
+    {{ form.hidden_tag() }}
+
+    <p>{{ form.name.label }} {{ form.name }}</p>
+    <p>{{ form.email.label }} {{ form.email }}</p>
+    <p>{{ form.password.label }} {{ form.password }}</p>
+    <p>{{ form.avatar.label }} {{ form.avatar }}</p>
+
+    <p>{{ form.submit }}</p>
+  </form>
+
+  <p>Ja tens compte? <a href="{{ url_for('auth.login') }}">Inicia sessió aquí</a></p>
+</div>
+{% endblock %}

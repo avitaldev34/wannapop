@@ -1,10 +1,12 @@
 from flask import Flask
 from flask_debugtoolbar import DebugToolbarExtension
 from .extensions import db
-from .models import User, Product
+from .models import db as users_bp
+from .models import db as products_bp
 import logging
 from logging.handlers import RotatingFileHandler
 from config import Config
+from .routes_auth import bp as auth_bp
 
 toolbar = DebugToolbarExtension()
 
@@ -36,5 +38,5 @@ def create_app():
     app.register_blueprint(users_bp)
     app.register_blueprint(products_bp)
     app.register_blueprint(main_bp)
-    
+    app.register_blueprint(auth_bp) 
     return app
