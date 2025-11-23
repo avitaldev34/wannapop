@@ -25,9 +25,11 @@ La base de dades no es puja al repositori (`database.db` està al `.gitignore`).
 
 Cada membre de l’equip ha de crear la seva pròpia còpia a partir de l’script `init.sql` o bé copiar la base inicial:
 
-### Opció 1: Crear des de l’script
+##  Crear des de l’script
 ```bash
 sqlite3 instance/sqlite/database.db < instance/sqlite/init.sql
+
+
 
 
 
