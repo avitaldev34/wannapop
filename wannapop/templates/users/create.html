@@ -8,6 +8,11 @@
     <p>{{ form.email.label }} {{ form.email }}</p>
     <p>{{ form.password.label }} {{ form.password }}</p>
     <p>{{ form.avatar.label }} {{ form.avatar }}</p>
+    <p>{{ form.role_id.label }} {{ form.role_id }}</p>  <!-- select de rol -->
     <p>{{ form.submit }}</p>
 </form>
+
+<div class="actions">
+    <a class="action" href="{{ url_for('main.list_users') }}">⬅️ Tornar</a>
+</div>
 {% endblock %}

@@ -8,6 +8,11 @@
     <p>{{ form.description.label }} {{ form.description }}</p>
     <p>{{ form.price.label }} {{ form.price }}</p>
     <p>{{ form.photo.label }} {{ form.photo }}</p>
+    <p>{{ form.category_id.label }} {{ form.category_id }}</p> <!-- 👈 select de categoria -->
     <p>{{ form.submit }}</p>
 </form>
+
+<div class="actions">
+    <a class="action" href="{{ url_for('main.list_products') }}">⬅️ Tornar</a>
+</div>
 {% endblock %}

@@ -1,10 +1,14 @@
 {% extends "layout/_base.html" %}
 {% block content %}
-<h1>Eliminar Usuari</h1>
-<p>Estàs segur que vols eliminar l'usuari {{ user.name }}?</p>
+<div class="container">
+  <div class="card" style="text-align: center;">
+    <h1>Eliminar Usuari</h1>
+    <p>Estàs segur que vols eliminar l'usuari <strong>{{ user.name }}</strong>?</p>
 
-<form method="POST">
-    <button type="submit">Confirmar eliminació</button>
-    <a href="{{ url_for('users.list_users') }}">Cancel·lar</a>
-</form>
+    <form method="POST" class="actions">
+      <button type="submit" class="action danger">Confirmar eliminació</button>
+      <a class="action" href="{{ url_for('main.list_users') }}">Cancel·lar</a>
+    </form>
+  </div>
+</div>
 {% endblock %}
