@@ -4,9 +4,10 @@
   <div class="card">
     <h1>{{ product.title }}</h1>
 
-    <!-- Imagen del producto con fallback -->
+    <!-- Imatge amb fallback si no hi ha foto -->
     <img src="{{ url_for('static', filename='uploads/' ~ (product.photo or 'product_default.png')) }}"
-      alt="Foto del producte {{ product.title }}" style="max-width: 300px; margin: 1rem auto; display: block;">
+         alt="Foto del producte {{ product.title }}"
+         style="max-width: 300px; margin: 1rem auto; display: block;">
 
     <p><strong>Descripció:</strong> {{ product.description }}</p>
     <p><strong>Preu:</strong> {{ product.price }} €</p>
@@ -15,38 +16,47 @@
 
     <!-- Estat de bloqueig -->
     {% if product.blocked %}
-    <div class="alert" style="background: #ffe0e0; border: 1px solid #ff7a7a; padding: .75rem; margin-top: 1rem;">
-      <p><strong>Estat:</strong> BLOQUEJAT</p>
-      <p><strong>Raó:</strong> {{ product.blocked.reason }}</p>
-      <p><strong>Moderador:</strong> {{ product.blocked.moderator.name }}</p>
-      <p><small>Creat: {{ product.blocked.created }}</small></p>
-    </div>
+      <div class="alert" style="background:#ffe0e0; border:1px solid #ff7a7a; padding:.75rem; margin-top:1rem;">
+        <p><strong>Estat:</strong> BLOQUEJAT</p>
+        <p><strong>Raó:</strong> {{ product.blocked.reason }}</p>
+        <p><strong>Moderador:</strong> {{ product.blocked.moderator.name }}</p>
+        <p><small>Creat: {{ product.blocked.created }}</small></p>
+      </div>
 
-    <!-- Formulari per DESBLOQUEJAR -->
-    <form method="POST" action="{{ url_for('block_products.unblock_product', product_id=product.id) }}" class="actions"
-      style="margin-top: .75rem;">
-      <button type="submit" class="action">Desbloquejar</button>
-    </form>
+      <!-- Formulari per DESBLOQUEJAR (només moderador/admin) -->
+      {% if current_user.is_authenticated and current_user.role.name in ["moderator", "admin"] %}
+        <form method="POST"
+              action="{{ url_for('block_products.unblock_product', product_id=product.id) }}"
+              class="actions"
+              style="margin-top:.75rem;">
+          <button type="submit" class="action">Desbloquejar</button>
+        </form>
+      {% endif %}
     {% else %}
-    <div class="alert" style="background: #e7ffe7; border: 1px solid #7aff7a; padding: .75rem; margin-top: 1rem;">
-      <p><strong>Estat:</strong> No bloquejat</p>
-    </div>
+      <div class="alert" style="background:#e7ffe7; border:1px solid #7aff7a; padding:.75rem; margin-top:1rem;">
+        <p><strong>Estat:</strong> No bloquejat</p>
+      </div>
 
-    <!-- Formulari per BLOQUEJAR -->
-    <form method="POST" action="{{ url_for('block_products.block_product', product_id=product.id) }}" class="actions"
-      style="margin-top: .75rem;">
-      <label for="reason"><strong>Raó del bloqueig:</strong></label>
-      <textarea id="reason" name="reason" rows="3" required style="width: 100%; margin: .5rem 0;"></textarea>
-      <button type="submit" class="action danger">Bloquejar</button>
-    </form>
+      <!-- Formulari per BLOQUEJAR (només moderador/admin) -->
+      {% if current_user.is_authenticated and current_user.role.name in ["moderator", "admin"] %}
+        <form method="POST"
+              action="{{ url_for('block_products.block_product', product_id=product.id) }}"
+              class="actions"
+              style="margin-top:.75rem;">
+          <label for="reason"><strong>Raó del bloqueig:</strong></label>
+          <textarea id="reason" name="reason" rows="3" required style="width:100%; margin:.5rem 0;"></textarea>
+          <button type="submit" class="action danger">Bloquejar</button>
+        </form>
+      {% endif %}
     {% endif %}
 
     <!-- Accions habituals -->
-    <div class="actions" style="margin-top: 1rem;">
+    <div class="actions" style="margin-top:1rem;">
       <a class="action" href="{{ url_for('products.update_product', id=product.id) }}">Editar</a>
       <a class="action danger" href="{{ url_for('products.delete_product', id=product.id) }}">Eliminar</a>
     </div>
 
+    <!-- Botó per tornar al llistat -->
     <div class="actions">
       <a class="action" href="{{ url_for('products.list_products') }}">⬅️ Tornar al llistat de productes</a>
     </div>

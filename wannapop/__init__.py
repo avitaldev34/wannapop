@@ -7,12 +7,13 @@ from logging.handlers import RotatingFileHandler
 from config import Config
 from .extensions import db, login_manager
 
-# Importem els blueprints correctament
+# Importem els blueprints 
 from .routes_users import bp_users
 from .routes_products import bp_products
 from .routes_main import bp as main_bp
 from .routes_auth import bp as auth_bp
-from .routes_block_products import bp_block_products
+from .routes_block_products import bp_block_products   # blueprint de moderació de productes
+from .routes_block_users import bp_block_users         # blueprint de moderació d’usuaris
 
 toolbar = DebugToolbarExtension()
 migrate = Migrate()
@@ -34,11 +35,11 @@ def create_app():
     login_manager.login_view = "auth.login"
     login_manager.login_message_category = "info"
 
-    # Debug Toolbar
+    # Debug Toolbar (només si està activada a config)
     if app.config.get("DEBUG_TB_ENABLED", False):
         toolbar.init_app(app)
 
-    # Configuració de logs
+    # Configuració de logs amb rotació
     log_handler = RotatingFileHandler("app.log", maxBytes=10240, backupCount=3)
     log_handler.setFormatter(logging.Formatter(
         "%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]"
@@ -57,6 +58,7 @@ def create_app():
     app.register_blueprint(bp_products)
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp)
-    app.register_blueprint(bp_block_products)
+    app.register_blueprint(bp_block_products)   # rutes de moderació de productes
+    app.register_blueprint(bp_block_users)      # rutes de moderació d’usuaris
 
     return app

@@ -1,17 +1,15 @@
-
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.security import generate_password_hash, check_password_hash
 from .extensions import db, login_manager
 from .forms import LoginForm, RegisterForm
-from .models import User, Role
+from .models import User, Role, BlockedUser   
 from werkzeug.utils import secure_filename
-from werkzeug.security import generate_password_hash
 import os
 
 bp = Blueprint("auth", __name__, url_prefix="/auth")
 
-# Carpeta de subida de avatares
+# Carpeta de pujada d’avatars
 UPLOAD_FOLDER = os.path.join("wannapop", "static", "uploads")
 DEFAULT_AVATAR = "user_default.jpg"
 
@@ -39,7 +37,13 @@ def login():
         email = form.email.data.strip().lower()
         user = User.query.filter_by(email=email).first()
 
+        # Comprovem si l’usuari existeix i contrasenya correcta
         if user and check_password_hash(user.password, form.password.data):
+            # Impedir login si l’usuari està bloquejat
+            if user.blocked:
+                flash(f"No pots iniciar sessió: Usuari bloquejat. Raó: {user.blocked.reason}", "danger")
+                return redirect(url_for("auth.login"))
+
             login_user(user)
             flash("Has iniciat sessió correctament.", "success")
             next_url = request.args.get("next")
@@ -62,7 +66,7 @@ def register():
 
     form = RegisterForm()
 
-    # Rellenar desplegable con roles de la BD
+    # Omplir desplegable amb rols de la BD
     form.role.choices = [(r.id, r.name) for r in Role.query.all()]
 
     if form.validate_on_submit():
@@ -72,7 +76,7 @@ def register():
             flash("Ja existeix un usuari amb aquest correu.", "warning")
             return redirect(url_for("auth.register"))
 
-        # Usar el rol seleccionado en el formulario
+        # Validar rol seleccionat
         selected_role = Role.query.get(form.role.data)
         if not selected_role:
             flash("El rol seleccionat no existeix.", "danger")
@@ -80,7 +84,6 @@ def register():
 
         # Guardar contrasenya hasheada
         password_hash = generate_password_hash(form.password.data, method="scrypt")
-
 
         new_user = User(
             name=form.name.data.strip(),

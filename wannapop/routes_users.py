@@ -4,14 +4,14 @@ from werkzeug.security import generate_password_hash
 import os
 
 from wannapop.extensions import db
-from wannapop.models import User, Role
+from wannapop.models import User, Role, BlockedUser   # ✅ importem BlockedUser
 from wannapop.forms import UserForm
 
 bp_users = Blueprint("users", __name__)
 
-# Carpeta de subida de avatares
+# Carpeta de pujada d’avatars
 UPLOAD_FOLDER = os.path.join("wannapop", "static", "uploads")
-DEFAULT_AVATAR = "user_default.jpg"  # imagen por defecto
+DEFAULT_AVATAR = "user_default.jpg"  # imatge per defecte
 
 # ------------------------------
 # USERS
@@ -58,7 +58,7 @@ def create_user():
         user = User(
             name=form.name.data,
             email=form.email.data,
-            password=generate_password_hash(form.password.data, method="scrypt"),  # ✅ hash seguro
+            password=generate_password_hash(form.password.data, method="scrypt"),  # hash segur
             avatar=filename,
             role_id=form.role_id.data
         )
@@ -85,7 +85,7 @@ def update_user(id):
         user.email = form.email.data
         user.role_id = form.role_id.data
 
-        # Solo rehashear si se ha introducido nueva contraseña
+        # Només rehash si s’ha introduït nova contrasenya
         if form.password.data:
             user.password = generate_password_hash(form.password.data, method="scrypt")
 
@@ -95,7 +95,7 @@ def update_user(id):
             form.avatar.data.save(filepath)
             user.avatar = filename
         elif not user.avatar:
-            # si no tiene avatar, poner el default
+            # si no té avatar, posar el per defecte
             user.avatar = DEFAULT_AVATAR
 
         db.session.commit()
@@ -107,14 +107,13 @@ def update_user(id):
 
 @bp_users.route("/users/delete/<int:id>", methods=["GET", "POST"])
 def delete_user(id):
-    """
-    Elimina un usuari i els seus productes associats.
-    """
     user = User.query.get_or_404(id)
     if request.method == "POST":
-        # eliminar productos asociados
         for product in user.products:
             db.session.delete(product)
+
+        if user.blocked:
+            db.session.delete(user.blocked)
 
         db.session.delete(user)
         db.session.commit()

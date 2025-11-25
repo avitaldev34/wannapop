@@ -4,7 +4,7 @@ import os
 
 from flask_login import login_required, current_user
 from wannapop.extensions import db
-from wannapop.models import Product, Category, BlockedProduct
+from wannapop.models import Product, Category
 from wannapop.forms import ProductForm
 
 bp_products = Blueprint("products", __name__)
@@ -21,7 +21,6 @@ DEFAULT_PHOTO = "product_default.png"
 def list_products():
     """
     Llista tots els productes amb la seva categoria i venedor.
-    Gràcies al relationship back_populates podem accedir a product.category.name i product.seller.name.
     """
     products = Product.query.all()
     return render_template("products/list_products.html", products=products)
@@ -68,7 +67,7 @@ def create_product():
         )
         db.session.add(product)
         db.session.commit()
-        flash("Producte creat correctament!", "success")  # ✅ missatge flash
+        flash("Producte creat correctament!", "success")
         return redirect(url_for("products.list_products"))
 
     return render_template("products/create.html", form=form)
@@ -100,7 +99,7 @@ def update_product(id):
             product.photo = DEFAULT_PHOTO
 
         db.session.commit()
-        flash("Producte actualitzat correctament!", "success")  # ✅ missatge flash
+        flash("Producte actualitzat correctament!", "success")
         return redirect(url_for("products.read_product", id=product.id))
 
     return render_template("products/update.html", form=form, product=product)
@@ -115,13 +114,10 @@ def delete_product(id):
     product = Product.query.get_or_404(id)
 
     if request.method == "POST":
-        block = BlockedProduct.query.filter_by(product_id=id).first()
-        if block:
-            db.session.delete(block)
-
+        # ✅ Amb cascade ja s'elimina el bloqueig associat automàticament.
         db.session.delete(product)
         db.session.commit()
-        flash(f"Producte '{product.title}' eliminat correctament!", "success")  # ✅ missatge flash
+        flash(f"Producte '{product.title}' eliminat correctament!", "success")
         return redirect(url_for("products.list_products"))
 
     return render_template("products/delete.html", product=product)

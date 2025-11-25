@@ -11,7 +11,6 @@ class Role(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), unique=True, nullable=False)
 
-    # Relació amb usuaris
     users = db.relationship("User", back_populates="role")
 
     def __repr__(self):
@@ -30,12 +29,19 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(255), nullable=False)
     avatar = db.Column(db.String(200), nullable=False, default="user_default.jpg")
 
-    # Clau forana cap a roles
     role_id = db.Column(db.Integer, db.ForeignKey("roles.id"), nullable=False)
     role = db.relationship("Role", back_populates="users")
 
-    # Relació amb productes (com a venedor)
     products = db.relationship("Product", back_populates="seller", cascade="all, delete-orphan")
+
+    # relació amb bloqueig d'usuari (1:1)
+    blocked = db.relationship(
+        "BlockedUser",
+        foreign_keys="BlockedUser.user_id",
+        back_populates="user",
+        uselist=False,
+        cascade="all, delete-orphan"
+    )
 
     def __repr__(self):
         return f"<User id={self.id} name={self.name} email={self.email} role_id={self.role_id}>"
@@ -50,7 +56,6 @@ class Category(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), unique=True, nullable=False)
 
-    # Relació amb productes
     products = db.relationship("Product", back_populates="category")
 
     def __repr__(self):
@@ -69,11 +74,9 @@ class Product(db.Model):
     price = db.Column(db.Float, nullable=False)
     photo = db.Column(db.String(255), nullable=False, default="product_default.png")
 
-    # Clau forana cap a categories
     category_id = db.Column(db.Integer, db.ForeignKey("categories.id"), nullable=False)
     category = db.relationship("Category", back_populates="products")
 
-    # Clau forana cap a users (venedor)
     seller_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     seller = db.relationship("User", back_populates="products")
 
@@ -85,29 +88,41 @@ class Product(db.Model):
 # Taula BlockedProducts
 # ------------------------------
 class BlockedProduct(db.Model):
-    """
-    Model de moderació per a productes bloquejats.
-    - Cada producte pot tenir com a màxim un registre de bloqueig (clau primària = product_id).
-    - Guarda qui és el moderador (usuari) i la raó del bloqueig.
-    - 'created' es posa automàticament a la creació del registre.
-    """
     __tablename__ = "blocked_products"
 
-    # product_id és clau primària (no autoincrement) i també clau forana cap a products.id
     product_id = db.Column(db.Integer, db.ForeignKey("products.id"), primary_key=True)
-
-    # moderator_id és clau forana cap a users.id
     moderator_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-
-    # reason és text obligatori amb la raó del bloqueig
     reason = db.Column(db.Text, nullable=False)
-
-    # created guarda la data/hora de creació automàticament
     created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
-    # Relacions
     product = db.relationship("Product", backref=db.backref("blocked", uselist=False, cascade="all, delete"))
-    moderator = db.relationship("User", backref=db.backref("moderations", lazy="dynamic"))
+    moderator = db.relationship("User", backref=db.backref("moderations_products", lazy="dynamic"))
 
     def __repr__(self):
         return f"<BlockedProduct product_id={self.product_id} moderator_id={self.moderator_id}>"
+
+
+# ------------------------------
+# Taula BlockedUsers
+# ------------------------------
+class BlockedUser(db.Model):
+    __tablename__ = "blocked_users"
+
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), primary_key=True)
+    moderator_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    reason = db.Column(db.Text, nullable=False)
+    created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+    user = db.relationship(
+        "User",
+        foreign_keys=[user_id],
+        back_populates="blocked"
+    )
+    moderator = db.relationship(
+        "User",
+        foreign_keys=[moderator_id],
+        backref=db.backref("moderations_users", lazy="dynamic")
+    )
+
+    def __repr__(self):
+        return f"<BlockedUser user_id={self.user_id} moderator_id={self.moderator_id}>"
