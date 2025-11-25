@@ -1,0 +1,28 @@
+{% extends "layout/_base.html" %}
+{% block content %}
+<div class="container">
+  <div class="card">
+    <h2>Detalls Usuari</h2>
+
+    <!-- Avatar amb fallback -->
+    <img src="{{ url_for('static', filename='uploads/' ~ (user.avatar or 'user_default.jpg')) }}"
+      alt="Avatar de {{ user.name }}" style="max-width: 200px; margin: 1rem auto; display: block;">
+
+    <p><strong>Nom:</strong> {{ user.name }}</p>
+    <p><strong>Email:</strong> {{ user.email }}</p>
+    <p><strong>Rol:</strong> {{ user.role.name }}</p>
+
+    <!-- Accions habituals -->
+    <div class="actions" style="margin-top: 1rem;">
+      <a class="action" href="{{ url_for('users.update_user', id=user.id) }}">📝 Editar</a>
+      <a class="action danger" href="{{ url_for('users.delete_user', id=user.id) }}">🗑️ Eliminar</a>
+    </div>
+
+
+
+  </div>
+  <div class="actions">
+    <a class="action" href="{{ url_for('users.list_users') }}">⬅️ Tornar al llistat</a>
+  </div>
+</div>
+{% endblock %}

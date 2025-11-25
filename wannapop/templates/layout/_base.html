@@ -9,14 +9,14 @@
   <header>
     <h1>Wannapop</h1>
     <nav>
-      <a href="{{ url_for('main.index') }}">Inici</a>
-      <a href="{{ url_for('main.list_products') }}">Productes</a>
-      <a href="{{ url_for('main.list_users') }}">Usuaris</a>
+      
       {% if current_user.is_authenticated %}
+        <!-- Botó de logout (blueprint auth) -->
         <form method="POST" action="{{ url_for('auth.logout') }}" style="display:inline;">
           <button type="submit" class="action">🚪 Logout</button>
         </form>
       {% else %}
+        <!-- Enllaços de login i registre (blueprint auth) -->
         <a href="{{ url_for('auth.login') }}">Login</a>
         <a href="{{ url_for('auth.register') }}">Registre</a>
       {% endif %}

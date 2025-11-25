@@ -3,25 +3,32 @@
 <div class="container">
   <h2>Llista de Productes</h2>
   <div class="actions">
-    <a class="action" href="{{ url_for('main.create_product') }}">➕ Crear Producte</a>
+    <a class="action" href="{{ url_for('products.create_product') }}">➕ Crear Producte</a>
   </div>
 
   <div class="grid">
     {% for product in products %}
-      <div class="card">
-        <img src="{{ url_for('static', filename='uploads/' ~ (product.photo or 'product_default.png')) }}" alt="Foto de {{ product.title }}">
-        <h3>{{ product.title }}</h3>
-        <p>{{ product.description }}</p>
-        <p><strong>Preu:</strong> {{ product.price }} €</p>
-        <p><strong>Categoria:</strong> {{ product.category.name }}</p>
-        <p><strong>Venedor:</strong> {{ product.seller.name }}</p>
-        <div class="actions">
-          <a class="action" href="{{ url_for('main.read_product', id=product.id) }}">👁️ Veure</a>
-          <a class="action" href="{{ url_for('main.update_product', id=product.id) }}">📝 Editar</a>
-          <a class="action" href="{{ url_for('main.delete_product', id=product.id) }}" style="background-color: var(--danger)">🗑️ Eliminar</a>
-        </div>
+    <div class="card">
+      <img src="{{ url_for('static', filename='uploads/' ~ (product.photo or 'product_default.png')) }}"
+        alt="Foto de {{ product.title }}">
+      <h3>{{ product.title }}</h3>
+      <p>{{ product.description }}</p>
+      <p><strong>Preu:</strong> {{ product.price }} €</p>
+      <p><strong>Categoria:</strong> {{ product.category.name }}</p>
+      <p><strong>Venedor:</strong> {{ product.seller.name }}</p>
+      <div class="actions">
+        <a class="action" href="{{ url_for('products.read_product', id=product.id) }}">👁️ Veure</a>
+        <a class="action" href="{{ url_for('products.update_product', id=product.id) }}">📝 Editar</a>
+        <a class="action" href="{{ url_for('products.delete_product', id=product.id) }}"
+          style="background-color: var(--danger)">🗑️ Eliminar</a>
       </div>
+    </div>
     {% endfor %}
   </div>
+
+  <div class="actions">
+    <a class="action" href="{{ url_for('main.index') }}">⬅️ Tornar a la pàgina principal</a>
+  </div>
+
 </div>
 {% endblock %}

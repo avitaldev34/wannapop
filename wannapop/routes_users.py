@@ -1,112 +1,124 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, abort, current_app
-import logging
-import os
+from flask import Blueprint, render_template, redirect, url_for, flash, request
 from werkzeug.utils import secure_filename
-from wannapop.models import User, db
+from werkzeug.security import generate_password_hash
+import os
+
+from wannapop.extensions import db
+from wannapop.models import User, Role
 from wannapop.forms import UserForm
 
-bp = Blueprint("users", __name__, url_prefix="/users")
-logger = logging.getLogger(__name__)
+bp_users = Blueprint("users", __name__)
 
-# Ruta: /users/list
-@bp.route("/list")
+# Carpeta de subida de avatares
+UPLOAD_FOLDER = os.path.join("wannapop", "static", "uploads")
+DEFAULT_AVATAR = "user_default.jpg"  # imagen por defecto
+
+# ------------------------------
+# USERS
+# ------------------------------
+
+@bp_users.route("/users")
 def list_users():
+    """
+    Llista tots els usuaris.
+    """
     users = User.query.all()
-    logger.debug(f"Se han recuperado {len(users)} usuarios de la BD")
     return render_template("users/list_users.html", users=users)
 
-# Ruta: /users/read/<id>
-@bp.route("/read/<int:user_id>")
-def read_user(user_id):
-    user = User.query.get(user_id)
-    if user is None:
-        logger.warning(f"Usuario con id {user_id} no encontrado")
-        abort(404)
-    return render_template("users/read_users.html", user=user)
 
-# Ruta: /users/create
-@bp.route("/create", methods=["GET", "POST"])
+@bp_users.route("/users/<int:id>")
+def read_user(id):
+    """
+    Mostra el detall d'un usuari.
+    """
+    user = User.query.get_or_404(id)
+    return render_template("users/read_user.html", user=user)
+
+
+@bp_users.route("/users/create", methods=["GET", "POST"])
 def create_user():
+    """
+    Crea un nou usuari amb rol seleccionable.
+    """
     form = UserForm()
-    if request.method == "POST":
-        if form.validate_on_submit():
-            avatar_filename = None
+    roles = Role.query.all()
+    form.role_id.choices = [(r.id, r.name) for r in roles]
 
-            if form.avatar.data:
-                filename = secure_filename(form.avatar.data.filename)
-                uploads_dir = current_app.config["UPLOAD_FOLDER"]
-                os.makedirs(uploads_dir, exist_ok=True)
-                avatar_path = os.path.join(uploads_dir, filename)
-                form.avatar.data.save(avatar_path)
-                avatar_filename = filename
+    if not roles:
+        flash("Has de crear rols abans de poder crear usuaris.", "warning")
+        return redirect(url_for("users.list_users"))
 
-            # Imagen por defecto si no se sube ninguna
-            if not avatar_filename or avatar_filename.strip() == "":
-                avatar_filename = "user_default.jpg"
+    if form.validate_on_submit():
+        filename = DEFAULT_AVATAR
+        if form.avatar.data:
+            filename = secure_filename(form.avatar.data.filename)
+            filepath = os.path.join(UPLOAD_FOLDER, filename)
+            form.avatar.data.save(filepath)
 
-
-            new_user = User(
-                name=form.name.data,
-                email=form.email.data,
-                password=form.password.data,
-                avatar=avatar_filename
-            )
-            db.session.add(new_user)
-            db.session.commit()
-
-            flash("Usuari creat correctament!", "success")
-            return redirect(url_for("users.list_users"))
-        else:
-            flash("Errors en el formulari", "danger")
+        user = User(
+            name=form.name.data,
+            email=form.email.data,
+            password=generate_password_hash(form.password.data, method="scrypt"),  # ✅ hash seguro
+            avatar=filename,
+            role_id=form.role_id.data
+        )
+        db.session.add(user)
+        db.session.commit()
+        flash("Usuari creat correctament!", "success")
+        return redirect(url_for("users.list_users"))
 
     return render_template("users/create.html", form=form)
 
-# Ruta: /users/update/<id>
-@bp.route("/update/<int:user_id>", methods=["GET", "POST"])
-def update_user(user_id):
-    user = User.query.get(user_id)
-    if user is None:
-        abort(404)
 
+@bp_users.route("/users/update/<int:id>", methods=["GET", "POST"])
+def update_user(id):
+    """
+    Actualitza un usuari existent.
+    """
+    user = User.query.get_or_404(id)
     form = UserForm(obj=user)
+    roles = Role.query.all()
+    form.role_id.choices = [(r.id, r.name) for r in roles]
 
-    if request.method == "POST":
-        if form.validate_on_submit():
-            user.name = form.name.data
-            user.email = form.email.data
-            user.password = form.password.data
+    if form.validate_on_submit():
+        user.name = form.name.data
+        user.email = form.email.data
+        user.role_id = form.role_id.data
 
-            if form.avatar.data:
-                filename = secure_filename(form.avatar.data.filename)
-                uploads_dir = current_app.config["UPLOAD_FOLDER"]
-                os.makedirs(uploads_dir, exist_ok=True)
-                avatar_path = os.path.join(uploads_dir, filename)
-                form.avatar.data.save(avatar_path)
-                user.avatar = filename
+        # Solo rehashear si se ha introducido nueva contraseña
+        if form.password.data:
+            user.password = generate_password_hash(form.password.data, method="scrypt")
 
-            # Imagen por defecto si no tiene ninguna
-            if not user.avatar:
-                user.avatar = "user_default.png"
+        if form.avatar.data:
+            filename = secure_filename(form.avatar.data.filename)
+            filepath = os.path.join(UPLOAD_FOLDER, filename)
+            form.avatar.data.save(filepath)
+            user.avatar = filename
+        elif not user.avatar:
+            # si no tiene avatar, poner el default
+            user.avatar = DEFAULT_AVATAR
 
-            db.session.commit()
-            flash("Usuari actualitzat correctament!", "success")
-            return redirect(url_for("users.list_users"))
-        else:
-            flash("Errors en el formulari", "danger")
+        db.session.commit()
+        flash("Usuari actualitzat correctament!", "success")
+        return redirect(url_for("users.read_user", id=user.id))
 
     return render_template("users/update.html", form=form, user=user)
 
-# Ruta: /users/delete/<id>
-@bp.route("/delete/<int:user_id>", methods=["GET", "POST"])
-def delete_user(user_id):
-    user = User.query.get(user_id)
-    if user is None:
-        abort(404)
 
+@bp_users.route("/users/delete/<int:id>", methods=["GET", "POST"])
+def delete_user(id):
+    """
+    Elimina un usuari i els seus productes associats.
+    """
+    user = User.query.get_or_404(id)
     if request.method == "POST":
+        # eliminar productos asociados
+        for product in user.products:
+            db.session.delete(product)
+
         db.session.delete(user)
         db.session.commit()
-        flash("Usuari eliminat correctament!", "success")
+        flash(f"Usuari '{user.name}' eliminat correctament!", "success")
         return redirect(url_for("users.list_users"))
 
     return render_template("users/delete.html", user=user)

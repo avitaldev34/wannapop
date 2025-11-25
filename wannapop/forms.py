@@ -9,7 +9,7 @@ class UserForm(FlaskForm):
     email = StringField("Email", validators=[DataRequired(), Email()])
     password = PasswordField("Contrasenya", validators=[DataRequired()])
     avatar = FileField("Avatar")  # imatge pujada
-    role_id = SelectField("Rol", coerce=int)   # 👈 nou camp per seleccionar rol
+    role_id = SelectField("Rol", coerce=int)   
     submit = SubmitField("Guardar")
 
 
@@ -18,10 +18,9 @@ class ProductForm(FlaskForm):
     title = StringField("Títol", validators=[DataRequired()])
     description = TextAreaField("Descripció", validators=[DataRequired()])
     price = DecimalField("Preu", validators=[DataRequired()])
-    photo = FileField("Foto")  # imatge pujada
-    category_id = SelectField("Categoria", coerce=int)  # 👈 nou camp per seleccionar categoria
+    photo = FileField("Foto")
+    category_id = SelectField("Categoria", coerce=int, validators=[DataRequired()])
     submit = SubmitField("Guardar")
-
 
 # Formulari de Login
 class LoginForm(FlaskForm):
@@ -33,7 +32,8 @@ class LoginForm(FlaskForm):
 # Formulari de Registre
 class RegisterForm(FlaskForm):
     name = StringField("Nom", validators=[DataRequired(), Length(min=2, max=50)])
-    email = StringField("Correu electrònic", validators=[DataRequired(), Email()])
-    password = PasswordField("Contrasenya", validators=[DataRequired(), Length(min=6)])
-    avatar = FileField("Avatar (opcional)")
-    submit = SubmitField("Registrar-se")
+    email = StringField("Email", validators=[DataRequired(), Email()])
+    password = PasswordField("Contrasenya", validators=[DataRequired(), Length(min=4)])
+    avatar = FileField("Avatar")
+    role = SelectField("Rol", choices=[], coerce=int)
+    submit = SubmitField("Registrar")
