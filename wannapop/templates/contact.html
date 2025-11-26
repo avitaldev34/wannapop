@@ -1,0 +1,17 @@
+{% extends "layout/_base.html" %}
+{% block content %}
+<div class="container">
+  <h2>Contacte</h2>
+  <p>Pots contactar amb l'equip de Wannapop mitjançant aquest formulari.</p>
+
+  <form method="POST" action="#" style="margin-top:1rem;">
+    <label for="subject">Assumpte:</label>
+    <input type="text" id="subject" name="subject" required>
+
+    <label for="message">Missatge:</label>
+    <textarea id="message" name="message" rows="5" required></textarea>
+
+    <button type="submit" class="action">📧 Enviar</button>
+  </form>
+</div>
+{% endblock %}

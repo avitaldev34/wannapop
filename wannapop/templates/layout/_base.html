@@ -1,41 +1,73 @@
 <!DOCTYPE html>
 <html lang="ca">
+
 <head>
   <meta charset="UTF-8">
   <title>Wannapop</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
+
 <body>
   <header>
     <h1>Wannapop</h1>
     <nav>
-      
       {% if current_user.is_authenticated %}
-        <!-- Botó de logout (blueprint auth) -->
-        <form method="POST" action="{{ url_for('auth.logout') }}" style="display:inline;">
-          <button type="submit" class="action">🚪 Logout</button>
-        </form>
+      <!-- Menú principal visible per qualsevol usuari autenticat -->
+      <a href="{{ url_for('main.index') }}">🏠 Inici</a>
+      <a href="{{ url_for('products.list_products') }}">📦 Productes</a>
+      <a href="{{ url_for('users.list_users') }}">👥 Usuaris</a>
+
+      <!-- Enllaç a Perfil (tothom autenticat) -->
+      <a href="{{ url_for('profile.profile') }}">🙍 Perfil</a>
+
+      <!-- Enllaç a Admin (només admin/moderator) -->
+      {% if current_user.role.name in ["admin","moderator"] %}
+      <a href="{{ url_for('admin.admin') }}">⚙️ Admin</a>
+      {% endif %}
+
+      <!-- Només wanner pot crear productes -->
+      {% if current_user.role.name == "wanner" %}
+      <a href="{{ url_for('products.create_product') }}">➕ Nou producte</a>
+      {% endif %}
+
+      <!-- Només admin pot crear usuaris -->
+      {% if current_user.role.name == "admin" %}
+      <a href="{{ url_for('users.create_user') }}">➕ Nou usuari</a>
+      {% endif %}
+
+      <!-- Botó de logout -->
+      <form method="POST" action="{{ url_for('auth.logout') }}" style="display:inline;">
+        <button type="submit" class="action">🚪 Logout</button>
+      </form>
       {% else %}
-        <!-- Enllaços de login i registre (blueprint auth) -->
-        <a href="{{ url_for('auth.login') }}">Login</a>
-        <a href="{{ url_for('auth.register') }}">Registre</a>
+      <!-- Enllaços de login i registre -->
+      <a href="{{ url_for('auth.login') }}">Login</a>
+      <a href="{{ url_for('auth.register') }}">Registre</a>
       {% endif %}
     </nav>
   </header>
 
   <div class="container">
+    <!-- Missatges flash -->
     {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          <div class="flash {{ category }}">{{ message }}</div>
-        {% endfor %}
-      {% endif %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="flash {{ category }}">{{ message }}</div>
+    {% endfor %}
+    {% endif %}
     {% endwith %}
+
+    <!-- Contingut específic de cada vista -->
     {% block content %}{% endblock %}
   </div>
 
   <footer>
     <p>Wannapop © 2025 - by aviTalDev </p>
+    {% if current_user.is_authenticated %}
+    <!-- Enllaç a Contacte visible per tothom autenticat -->
+    <a href="{{ url_for('main.contact') }}">📧 Contacte</a>
+    {% endif %}
   </footer>
 </body>
+
 </html>

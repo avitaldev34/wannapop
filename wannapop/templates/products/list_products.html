@@ -3,16 +3,19 @@
 <div class="container">
   <h2>Llista de Productes</h2>
 
-  <!-- Crear producte només si autenticat -->
-  {% if current_user.is_authenticated %}
-    <div class="actions" style="margin-bottom:1rem;">
-      <a class="action" href="{{ url_for('products.create_product') }}">➕ Crear Producte</a>
-    </div>
-  {% endif %}
+  {# Missatges flash #}
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
 
   <div class="grid">
     {% for product in products %}
       {% set is_blocked = product.blocked %}
+      {# Si el producte està bloquejat, pintem la targeta en vermell #}
       <div class="card" {% if is_blocked %}style="background:#ffe6e6; border:1px solid #ff9b9b;"{% endif %}>
         <img src="{{ url_for('static', filename='uploads/' ~ (product.photo or 'product_default.png')) }}"
              alt="Foto de {{ product.title }}"
@@ -28,15 +31,16 @@
         {% endif %}
 
         <div class="actions">
+          {# Tothom pot veure el detall #}
           <a class="action" href="{{ url_for('products.read_product', id=product.id) }}">👁️ Veure</a>
 
-          <!-- Editar / Eliminar només si és el venedor o admin -->
+          {# Editar / Eliminar només si és el venedor o admin #}
           {% if current_user.is_authenticated and (current_user.id == product.seller.id or current_user.role.name == "admin") %}
             <a class="action" href="{{ url_for('products.update_product', id=product.id) }}">📝 Editar</a>
             <a class="action danger" href="{{ url_for('products.delete_product', id=product.id) }}">🗑️ Eliminar</a>
           {% endif %}
 
-          <!-- Bloquejar / Desbloquejar només moderator/admin -->
+          {# Bloquejar / Desbloquejar només moderator/admin #}
           {% if current_user.is_authenticated and current_user.role.name in ["moderator", "admin"] %}
             {% if not is_blocked %}
               <form method="POST" action="{{ url_for('block_products.block_product', product_id=product.id) }}" style="display:inline;">

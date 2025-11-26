@@ -1,6 +1,7 @@
 {% extends "layout/_base.html" %}
 {% block content %}
 <div class="container">
+  {# Targeta amb estil diferent si l'usuari està bloquejat #}
   <div class="card"
        {% if user.blocked %}style="background:#ffe6e6; border:1px solid #ff9b9b;"{% endif %}>
     <h2>Detalls Usuari</h2>
@@ -16,6 +17,7 @@
 
     <!-- Estat de bloqueig -->
     {% if user.blocked %}
+      {# Si està bloquejat, mostrem informació del bloqueig #}
       <div class="alert" style="background:#ffe0e0; border:1px solid #ff7a7a; padding:.75rem; margin-top:1rem;">
         <p><strong>Estat:</strong> BLOQUEJAT</p>
         <p><strong>Raó:</strong> {{ user.blocked.reason }}</p>
@@ -30,6 +32,7 @@
         {% endif %}
       </div>
     {% else %}
+      {# Si no està bloquejat, mostrem estat verd i opció de bloquejar #}
       <div class="alert" style="background:#e7ffe7; border:1px solid #7aff7a; padding:.75rem; margin-top:1rem;">
         <p><strong>Estat:</strong> No bloquejat</p>
 
@@ -44,7 +47,7 @@
       </div>
     {% endif %}
 
-    <!-- Accions habituals -->
+    <!-- Accions habituals (editar/eliminar només admin) -->
     <div class="actions" style="margin-top:1rem;">
       {% if current_user.is_authenticated and current_user.role.name == "admin" %}
         <a class="action" href="{{ url_for('users.update_user', id=user.id) }}">📝 Editar</a>
@@ -53,6 +56,7 @@
     </div>
   </div>
 
+  <!-- Botó per tornar al llistat -->
   <div class="actions" style="margin-top:1rem;">
     <a class="action" href="{{ url_for('users.list_users') }}">⬅️ Tornar al llistat</a>
   </div>

@@ -1,0 +1,47 @@
+{% extends "layout/_base.html" %}
+{% block content %}
+<div class="container">
+  <h2>Perfil d'Usuari</h2>
+
+  <div class="card" {% if user.blocked %}style="background:#ffe6e6;"{% endif %}>
+    <img src="{{ url_for('static', filename='uploads/' ~ (user.avatar or 'user_default.jpg')) }}"
+         alt="Avatar de {{ user.name }}" style="max-width:150px; margin:auto; display:block;">
+    <p><strong>Nom:</strong> {{ user.name }}</p>
+    <p><strong>Email:</strong> {{ user.email }}</p>
+    <p><strong>Rol:</strong> {{ user.role.name }}</p>
+
+    {% if user.blocked %}
+      <p style="color:#c00;"><strong>Estat:</strong> Bloquejat</p>
+      <p><strong>Raó:</strong> {{ user.blocked.reason }}</p>
+    {% else %}
+      <p style="color:green;"><strong>Estat:</strong> Actiu</p>
+    {% endif %}
+
+    <!-- Formulari per canviar nom i avatar -->
+    <form method="POST" enctype="multipart/form-data" style="margin-top:1rem;">
+      <label for="name">Nou nom:</label>
+      <input type="text" id="name" name="name" value="{{ user.name }}">
+      <label for="avatar">Nou avatar:</label>
+      <input type="file" id="avatar" name="avatar">
+      <button type="submit" class="action">💾 Actualitzar perfil</button>
+    </form>
+  </div>
+
+  {% if user.role.name == "wanner" %}
+    <h3>Els meus productes</h3>
+    <div class="grid">
+      {% for product in products %}
+        <div class="card" {% if product.blocked %}style="background:#ffe6e6;"{% endif %}>
+          <h4>{{ product.title }}</h4>
+          <p>{{ product.description }}</p>
+          <p><strong>Preu:</strong> {{ product.price }} €</p>
+          {% if product.blocked %}
+            <p style="color:#c00;"><strong>Bloquejat:</strong> {{ product.blocked.reason }}</p>
+          {% endif %}
+          <a href="{{ url_for('products.read_product', id=product.id) }}">👁️ Veure producte</a>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

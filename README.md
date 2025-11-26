@@ -1,36 +1,68 @@
-# Wannapop — Projecte de compra i venda de productes de segona mà
+# Wannapop
 
-Aquest projecte és una aplicació web desenvolupada amb Flask que permet la compra i venda de productes de segona mà. A continuació es detallen els passos seguits fins a la versió actual.
-
----
-
-## Estructura del projecte
-
-2526-projecte-1-equip/ ├── .venv/ # Entorn virtual (ignorat) ├── instance/ │ └── sqlite/ │ ├── database.db # Base de dades local (ignorada) │ ├── database.db.initial # Base de dades inicial │ └── init.sql # Script SQL per crear la BD ├── static/ # Fitxers estàtics ├── templates/ # Plantilles HTML ├── wappazon/ # Codi font de l'aplicació Flask │ ├── init.py │ ├── config.py │ ├── models.py │ ├── routes_users.py │ └── routes_products.py └── README.md # Aquest document
-
+Aplicació web de compra-venda de productes amb gestió de rols i permisos.  
+Projecte desenvolupat amb **Flask**, **SQLAlchemy**, **Flask-Login** i **Flask-WTF**.
 
 ---
 
-## Configuració
+## 🚀 Funcionalitats
 
-- El projecte utilitza **Flask** com a framework web.
-- La base de dades és **SQLite**, ubicada a `instance/sqlite/database.db`.
-- La configuració es troba a `wappazon/config.py`.
+- **Autenticació i registre d’usuaris** (login/logout).
+- **Gestió de rols**:
+  - `wanner`: pot crear productes.
+  - `moderator`: pot bloquejar/desbloquejar usuaris i productes.
+  - `admin`: pot crear/editar/eliminar usuaris i productes.
+- **CRUD complet** per a usuaris i productes.
+- **Bloqueig d’usuaris i productes** amb registre de moderador, raó i data.
+- **Interfície amb Bootstrap-like CSS** i estils personalitzats.
+- **Missatges flash** per avisos, errors i èxits.
 
 ---
 
-## Base de dades
 
-La base de dades no es puja al repositori (`database.db` està al `.gitignore`).
+---
 
-Cada membre de l’equip ha de crear la seva pròpia còpia a partir de l’script `init.sql` o bé copiar la base inicial:
+## ⚙️ Instal·lació
 
-##  Crear des de l’script
-```bash
-sqlite3 instance/sqlite/database.db < instance/sqlite/init.sql
+1. **Clonar el repositori**:
+   ```bash
+   git clone <URL-del-repo>
+   cd wannapop
 
+2. **Crear entorn virtual**
+    python -m venv .venv
+    source .venv/bin/activate   # Linux/Mac
+    .venv\Scripts\activate      # Windows
 
+3. **instal·lar dependencies**
+    pip install -r requirements.txt
 
+4. **Initzilitzar bd.**
+    flask db init
+    flask db migrate
+    flask db upgrade
 
+5. **Execució**
+    flask run
 
+6. **Rols i permisos**
+Wanner:
+
+Crear productes.
+
+Veure usuaris wanner no bloquejats.
+
+Moderator:
+
+Bloquejar/desbloquejar usuaris wanner.
+
+Bloquejar/desbloquejar productes.
+
+Admin:
+
+Crear/editar/eliminar usuaris.
+
+Veure tots els usuaris.
+
+Editar/eliminar productes.
 

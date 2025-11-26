@@ -11,6 +11,7 @@ class Role(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), unique=True, nullable=False)
 
+    # Relació 1:N → un rol pot tenir molts usuaris
     users = db.relationship("User", back_populates="role")
 
     def __repr__(self):
@@ -29,12 +30,14 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(255), nullable=False)
     avatar = db.Column(db.String(200), nullable=False, default="user_default.jpg")
 
+    # Relació amb rol (N:1)
     role_id = db.Column(db.Integer, db.ForeignKey("roles.id"), nullable=False)
     role = db.relationship("Role", back_populates="users")
 
+    # Relació amb productes (1:N)
     products = db.relationship("Product", back_populates="seller", cascade="all, delete-orphan")
 
-    # relació amb bloqueig d'usuari (1:1)
+    # Relació amb bloqueig d'usuari (1:1)
     blocked = db.relationship(
         "BlockedUser",
         foreign_keys="BlockedUser.user_id",
@@ -56,6 +59,7 @@ class Category(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), unique=True, nullable=False)
 
+    # Relació amb productes (1:N)
     products = db.relationship("Product", back_populates="category")
 
     def __repr__(self):
@@ -74,9 +78,11 @@ class Product(db.Model):
     price = db.Column(db.Float, nullable=False)
     photo = db.Column(db.String(255), nullable=False, default="product_default.png")
 
+    # Relació amb categories (N:1)
     category_id = db.Column(db.Integer, db.ForeignKey("categories.id"), nullable=False)
     category = db.relationship("Category", back_populates="products")
 
+    # Relació amb venedor (N:1)
     seller_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     seller = db.relationship("User", back_populates="products")
 
@@ -95,7 +101,9 @@ class BlockedProduct(db.Model):
     reason = db.Column(db.Text, nullable=False)
     created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
+    # Relació 1:1 amb producte
     product = db.relationship("Product", backref=db.backref("blocked", uselist=False, cascade="all, delete"))
+    # Relació N:1 amb moderador
     moderator = db.relationship("User", backref=db.backref("moderations_products", lazy="dynamic"))
 
     def __repr__(self):
@@ -113,11 +121,13 @@ class BlockedUser(db.Model):
     reason = db.Column(db.Text, nullable=False)
     created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
+    # Relació 1:1 amb usuari bloquejat
     user = db.relationship(
         "User",
         foreign_keys=[user_id],
         back_populates="blocked"
     )
+    # Relació N:1 amb moderador
     moderator = db.relationship(
         "User",
         foreign_keys=[moderator_id],

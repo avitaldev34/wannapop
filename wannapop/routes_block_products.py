@@ -20,10 +20,12 @@ def block_product(product_id):
     - Crea el registre a blocked_products amb la raó i el moderador autenticat.
     - Retorna al read del producte amb missatge flash.
     """
+    # Comprovem permisos
     if not perm_moderate_products.can():
         flash("No tens permisos per moderar productes.", "danger")
         return redirect(url_for("products.read_product", id=product_id))
 
+    # Obtenim el producte
     product = Product.query.get_or_404(product_id)
 
     # Comprovem si ja està bloquejat
@@ -31,7 +33,7 @@ def block_product(product_id):
         flash("El producte ja està bloquejat.", "warning")
         return redirect(url_for("products.read_product", id=product_id))
 
-    # Obtenim dades del formulari
+    # Obtenim la raó del formulari
     reason = request.form.get("reason", "").strip()
     if not reason:
         flash("Has d'indicar una raó per bloquejar el producte.", "danger")
@@ -64,10 +66,12 @@ def unblock_product(product_id):
     - Elimina el registre de blocked_products.
     - Retorna al read del producte amb missatge flash.
     """
+    # Comprovem permisos
     if not perm_moderate_products.can():
         flash("No tens permisos per moderar productes.", "danger")
         return redirect(url_for("products.read_product", id=product_id))
 
+    # Obtenim el producte
     product = Product.query.get_or_404(product_id)
 
     # Comprovem si està bloquejat

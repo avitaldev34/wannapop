@@ -1,16 +1,19 @@
 :root {
-  --primary: #1d3557;
-  --secondary: #4f7791;
-  --accent: #a8dadc;
-  --danger: #e63946;
-  --success: #2a9d8f;
-  --light: #f1faee;
-  --dark: #0d1b2a;
-  --white: #ffffff;
-  --radius: 10px;
+  /* Paleta de colors i variables globals */
+  --primary: #1d3557;     /* Color principal (fons) */
+  --secondary: #4f7791;   /* Color secundari (botons, hover) */
+  --accent: #a8dadc;      /* Color d'accent (títols, hover) */
+  --danger: #e63946;      /* Color per accions perilloses (eliminar, bloquejar) */
+  --success: #2a9d8f;     /* Color per accions correctes (desbloquejar, èxit) */
+  --light: #f1faee;       /* Color clar per text/fons */
+  --dark: #0d1b2a;        /* Color fosc per header/footer */
+  --white: #ffffff;       /* Blanc per targetes */
+  --radius: 10px;         /* Radi per cantonades arrodonides */
 }
 
-/* BASE */
+/* ------------------------------
+   BASE
+------------------------------ */
 body {
   margin: 0;
   font-family: 'Segoe UI', Roboto, sans-serif;
@@ -26,7 +29,9 @@ h1, h2, h3 {
   letter-spacing: 1px;
 }
 
-/* HEADER */
+/* ------------------------------
+   HEADER
+------------------------------ */
 header {
   background-color: var(--dark);
   padding: 2rem;
@@ -61,14 +66,18 @@ nav a:hover {
   transform: scale(1.05);
 }
 
-/* CONTAINER */
+/* ------------------------------
+   CONTAINER
+------------------------------ */
 .container {
   max-width: 1200px;
   margin: auto;
   padding: 2rem;
 }
 
-/* CARD */
+/* ------------------------------
+   CARD (targetes per usuaris/productes)
+------------------------------ */
 .card {
   background-color: var(--white);
   color: var(--dark);
@@ -92,14 +101,18 @@ nav a:hover {
   margin-bottom: 1rem;
 }
 
-/* GRID */
+/* ------------------------------
+   GRID (disposició en graella)
+------------------------------ */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 2rem;
 }
 
-/* ACTION BUTTONS */
+/* ------------------------------
+   ACTION BUTTONS (botons d'acció)
+------------------------------ */
 .actions {
   display: flex;
   justify-content: center;
@@ -126,14 +139,16 @@ nav a:hover {
 }
 
 .action.danger {
-  background-color: var(--danger);
+  background-color: var(--danger); /* Botons per bloquejar/eliminar */
 }
 
 .action.success {
-  background-color: var(--success);
+  background-color: var(--success); /* Botons per desbloquejar/confirmar */
 }
 
-/* FORMS */
+/* ------------------------------
+   FORMS (formularis)
+------------------------------ */
 form {
   display: flex;
   flex-direction: column;
@@ -183,7 +198,9 @@ form button:hover, form .submit:hover {
   transform: scale(1.05);
 }
 
-/* FLASH MESSAGES */
+/* ------------------------------
+   FLASH MESSAGES (avisos)
+------------------------------ */
 .flash {
   padding: 1rem;
   border-radius: var(--radius);
@@ -207,7 +224,9 @@ form button:hover, form .submit:hover {
   color: var(--white);
 }
 
-/* FOOTER */
+/* ------------------------------
+   FOOTER
+------------------------------ */
 footer {
   background-color: var(--dark);
   color: var(--accent);
@@ -217,7 +236,9 @@ footer {
   font-size: 0.9rem;
 }
 
-/* RESPONSIVE */
+/* ------------------------------
+   RESPONSIVE (adaptació mòbil)
+------------------------------ */
 @media (max-width: 768px) {
   header h1 {
     font-size: 2.2rem;

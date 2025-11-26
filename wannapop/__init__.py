@@ -6,17 +6,20 @@ from logging.handlers import RotatingFileHandler
 
 from config import Config
 from .extensions import db, login_manager
-from flask_principal import Principal, identity_loaded, RoleNeed, UserNeed, AnonymousIdentity, Identity
+from flask_principal import Principal, identity_loaded, RoleNeed, UserNeed
 from flask_login import current_user
 
-# Importem els blueprints 
+# Importem els blueprints
 from .routes_users import bp_users
 from .routes_products import bp_products
 from .routes_main import bp as main_bp
 from .routes_auth import bp as auth_bp
 from .routes_block_products import bp_block_products   # blueprint de moderació de productes
 from .routes_block_users import bp_block_users         # blueprint de moderació d’usuaris
+from .routes_profile import bp_profile                 # blueprint de perfil (/profile)
+from .routes_admin import bp_admin                     # blueprint d’admin (/admin)
 
+# Extensions globals
 toolbar = DebugToolbarExtension()
 migrate = Migrate()
 principals = Principal()
@@ -47,7 +50,7 @@ def create_app():
     def on_identity_loaded(sender, identity):
         if current_user.is_authenticated:
             identity.user = current_user
-            # Afegim el rol actual del usuari
+            # Afegim el rol actual de l’usuari
             if getattr(current_user, "role", None):
                 identity.provides.add(RoleNeed(current_user.role.name))
             # Afegim també el seu UserNeed
@@ -78,5 +81,7 @@ def create_app():
     app.register_blueprint(auth_bp)
     app.register_blueprint(bp_block_products)   # rutes de moderació de productes
     app.register_blueprint(bp_block_users)      # rutes de moderació d’usuaris
+    app.register_blueprint(bp_profile)          # ruta /profile
+    app.register_blueprint(bp_admin)            # ruta /admin
 
     return app
