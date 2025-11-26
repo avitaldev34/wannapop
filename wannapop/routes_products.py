@@ -7,6 +7,9 @@ from wannapop.extensions import db
 from wannapop.models import Product, Category
 from wannapop.forms import ProductForm
 
+# Importem permisos de helper_role
+from wannapop.helper_role import perm_read_products, perm_write_products
+
 bp_products = Blueprint("products", __name__)
 
 UPLOAD_FOLDER = os.path.join("wannapop", "static", "uploads")
@@ -21,8 +24,20 @@ DEFAULT_PHOTO = "product_default.png"
 def list_products():
     """
     Llista tots els productes amb la seva categoria i venedor.
+    Accessible per admin, moderator i wanner.
+    - Els wanner NO veuen productes bloquejats.
+    - Moderator i admin veuen tots els productes.
     """
-    products = Product.query.all()
+    if not perm_read_products.can():
+        flash("No tens permisos per veure productes.", "danger")
+        return redirect(url_for("main.index"))
+
+    role = current_user.role.name
+    if role == "wanner":
+        products = Product.query.filter(Product.blocked == None).all()
+    else:
+        products = Product.query.all()
+
     return render_template("products/list_products.html", products=products)
 
 
@@ -31,8 +46,20 @@ def list_products():
 def read_product(id):
     """
     Mostra el detall d'un producte amb la seva categoria i venedor.
+    Accessible per admin, moderator i wanner.
+    - Els wanner només poden veure els seus propis productes bloquejats.
+    - Moderator i admin poden veure qualsevol producte.
     """
+    if not perm_read_products.can():
+        flash("No tens permisos per veure productes.", "danger")
+        return redirect(url_for("main.index"))
+
     product = Product.query.get_or_404(id)
+
+    if current_user.role.name == "wanner" and product.blocked and product.seller_id != current_user.id:
+        flash("Aquest producte està bloquejat i no el pots veure.", "warning")
+        return redirect(url_for("products.list_products"))
+
     return render_template("products/read_product.html", product=product)
 
 
@@ -41,7 +68,12 @@ def read_product(id):
 def create_product():
     """
     Crea un nou producte amb categoria seleccionable.
+    Només wanner.
     """
+    if not perm_write_products.can():
+        flash("Només els usuaris amb rol 'wanner' poden crear productes.", "danger")
+        return redirect(url_for("products.list_products"))
+
     form = ProductForm()
     categories = Category.query.all()
     form.category_id.choices = [(c.id, c.name) for c in categories]
@@ -63,7 +95,7 @@ def create_product():
             price=form.price.data,
             photo=filename,
             category_id=form.category_id.data,
-            seller_id=current_user.id   # ✅ venedor = usuari autenticat
+            seller_id=current_user.id   # venedor = usuari autenticat
         )
         db.session.add(product)
         db.session.commit()
@@ -78,8 +110,14 @@ def create_product():
 def update_product(id):
     """
     Actualitza un producte existent.
+    Només el propietari (wanner).
     """
     product = Product.query.get_or_404(id)
+
+    if product.seller_id != current_user.id or not perm_write_products.can():
+        flash("Només el propietari pot modificar aquest producte.", "danger")
+        return redirect(url_for("products.read_product", id=id))
+
     form = ProductForm(obj=product)
     categories = Category.query.all()
     form.category_id.choices = [(c.id, c.name) for c in categories]
@@ -110,11 +148,15 @@ def update_product(id):
 def delete_product(id):
     """
     Elimina un producte i el seu bloqueig si existeix.
+    Només el propietari (wanner).
     """
     product = Product.query.get_or_404(id)
 
+    if product.seller_id != current_user.id or not perm_write_products.can():
+        flash("Només el propietari pot eliminar aquest producte.", "danger")
+        return redirect(url_for("products.read_product", id=id))
+
     if request.method == "POST":
-        # ✅ Amb cascade ja s'elimina el bloqueig associat automàticament.
         db.session.delete(product)
         db.session.commit()
         flash(f"Producte '{product.title}' eliminat correctament!", "success")

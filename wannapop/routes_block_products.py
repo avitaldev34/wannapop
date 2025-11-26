@@ -3,43 +3,27 @@ from flask_login import current_user, login_required
 from wannapop.extensions import db
 from wannapop.models import Product, BlockedProduct
 
+# Importem permisos de helper_role
+from wannapop.helper_role import perm_moderate_products
+
 # Blueprint específic per moderació de productes
 bp_block_products = Blueprint("block_products", __name__)
 
-# ------------------------------
-# Decorador per restringir rols
-# ------------------------------
-def roles_required(*roles):
-    """
-    Decorador per restringir accés a usuaris amb determinats rols.
-    Exemple: @roles_required("moderator", "admin")
-    """
-    def wrapper(fn):
-        from functools import wraps
-        @wraps(fn)
-        def decorated_view(*args, **kwargs):
-            if not current_user.is_authenticated:
-                flash("Has d'iniciar sessió per accedir.", "danger")
-                return redirect(url_for("auth.login"))
-            if current_user.role.name not in roles:
-                flash("No tens permisos per fer aquesta acció.", "danger")
-                return redirect(url_for("products.read_product", id=kwargs.get("product_id")))
-            return fn(*args, **kwargs)
-        return decorated_view
-    return wrapper
-
-
 @bp_block_products.route("/products/<int:product_id>/block", methods=["POST"])
 @login_required
-@roles_required("moderator", "admin")   # ✅ només moderadors/admin poden bloquejar
 def block_product(product_id):
     """
     Bloqueja un producte:
+    - Només moderador/admin poden bloquejar (perm_moderate_products).
     - Comprova que el producte existeix.
     - No permet bloquejar si ja està bloquejat.
     - Crea el registre a blocked_products amb la raó i el moderador autenticat.
     - Retorna al read del producte amb missatge flash.
     """
+    if not perm_moderate_products.can():
+        flash("No tens permisos per moderar productes.", "danger")
+        return redirect(url_for("products.read_product", id=product_id))
+
     product = Product.query.get_or_404(product_id)
 
     # Comprovem si ja està bloquejat
@@ -71,15 +55,19 @@ def block_product(product_id):
 
 @bp_block_products.route("/products/<int:product_id>/unblock", methods=["POST"])
 @login_required
-@roles_required("moderator", "admin")   # ✅ només moderadors/admin poden desbloquejar
 def unblock_product(product_id):
     """
     Desbloqueja un producte:
+    - Només moderador/admin poden desbloquejar (perm_moderate_products).
     - Comprova que el producte existeix.
     - No permet desbloquejar si no està bloquejat.
     - Elimina el registre de blocked_products.
     - Retorna al read del producte amb missatge flash.
     """
+    if not perm_moderate_products.can():
+        flash("No tens permisos per moderar productes.", "danger")
+        return redirect(url_for("products.read_product", id=product_id))
+
     product = Product.query.get_or_404(product_id)
 
     # Comprovem si està bloquejat

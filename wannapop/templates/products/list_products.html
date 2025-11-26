@@ -2,33 +2,60 @@
 {% block content %}
 <div class="container">
   <h2>Llista de Productes</h2>
-  <div class="actions">
-    <a class="action" href="{{ url_for('products.create_product') }}">➕ Crear Producte</a>
-  </div>
+
+  <!-- Crear producte només si autenticat -->
+  {% if current_user.is_authenticated %}
+    <div class="actions" style="margin-bottom:1rem;">
+      <a class="action" href="{{ url_for('products.create_product') }}">➕ Crear Producte</a>
+    </div>
+  {% endif %}
 
   <div class="grid">
     {% for product in products %}
-    <div class="card">
-      <img src="{{ url_for('static', filename='uploads/' ~ (product.photo or 'product_default.png')) }}"
-        alt="Foto de {{ product.title }}">
-      <h3>{{ product.title }}</h3>
-      <p>{{ product.description }}</p>
-      <p><strong>Preu:</strong> {{ product.price }} €</p>
-      <p><strong>Categoria:</strong> {{ product.category.name }}</p>
-      <p><strong>Venedor:</strong> {{ product.seller.name }}</p>
-      <div class="actions">
-        <a class="action" href="{{ url_for('products.read_product', id=product.id) }}">👁️ Veure</a>
-        <a class="action" href="{{ url_for('products.update_product', id=product.id) }}">📝 Editar</a>
-        <a class="action" href="{{ url_for('products.delete_product', id=product.id) }}"
-          style="background-color: var(--danger)">🗑️ Eliminar</a>
+      {% set is_blocked = product.blocked %}
+      <div class="card" {% if is_blocked %}style="background:#ffe6e6; border:1px solid #ff9b9b;"{% endif %}>
+        <img src="{{ url_for('static', filename='uploads/' ~ (product.photo or 'product_default.png')) }}"
+             alt="Foto de {{ product.title }}"
+             style="max-width:120px; display:block; margin:.5rem auto;">
+        <h3>{{ product.title }}</h3>
+        <p>{{ product.description }}</p>
+        <p><strong>Preu:</strong> {{ product.price }} €</p>
+        <p><strong>Categoria:</strong> {{ product.category.name }}</p>
+        <p><strong>Venedor:</strong> {{ product.seller.name }}</p>
+
+        {% if is_blocked %}
+          <p style="color:#c00;"><strong>Estat:</strong> Bloquejat</p>
+        {% endif %}
+
+        <div class="actions">
+          <a class="action" href="{{ url_for('products.read_product', id=product.id) }}">👁️ Veure</a>
+
+          <!-- Editar / Eliminar només si és el venedor o admin -->
+          {% if current_user.is_authenticated and (current_user.id == product.seller.id or current_user.role.name == "admin") %}
+            <a class="action" href="{{ url_for('products.update_product', id=product.id) }}">📝 Editar</a>
+            <a class="action danger" href="{{ url_for('products.delete_product', id=product.id) }}">🗑️ Eliminar</a>
+          {% endif %}
+
+          <!-- Bloquejar / Desbloquejar només moderator/admin -->
+          {% if current_user.is_authenticated and current_user.role.name in ["moderator", "admin"] %}
+            {% if not is_blocked %}
+              <form method="POST" action="{{ url_for('block_products.block_product', product_id=product.id) }}" style="display:inline;">
+                <input type="hidden" name="reason" value="Incompliment normes">
+                <button type="submit" class="action danger">🚫 Bloquejar</button>
+              </form>
+            {% else %}
+              <form method="POST" action="{{ url_for('block_products.unblock_product', product_id=product.id) }}" style="display:inline;">
+                <button type="submit" class="action">✅ Desbloquejar</button>
+              </form>
+            {% endif %}
+          {% endif %}
+        </div>
       </div>
-    </div>
     {% endfor %}
   </div>
 
-  <div class="actions">
+  <div class="actions" style="margin-top:1rem;">
     <a class="action" href="{{ url_for('main.index') }}">⬅️ Tornar a la pàgina principal</a>
   </div>
-
 </div>
 {% endblock %}

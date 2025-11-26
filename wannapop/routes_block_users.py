@@ -26,8 +26,14 @@ def roles_required(*roles):
 def block_user(user_id):
     user = User.query.get_or_404(user_id)
 
+    # Només es poden bloquejar usuaris wanner
     if user.role.name != "wanner":
         flash("Només es poden bloquejar usuaris amb rol 'wanner'.", "warning")
+        return redirect(url_for("users.read_user", id=user_id))
+
+    # Evitar que un admin es bloquegi a si mateix
+    if user.id == current_user.id:
+        flash("No pots bloquejar-te a tu mateix.", "danger")
         return redirect(url_for("users.read_user", id=user_id))
 
     if user.blocked:
@@ -45,6 +51,7 @@ def block_user(user_id):
 
     flash("Usuari bloquejat correctament.", "success")
     return redirect(url_for("users.read_user", id=user_id))
+
 
 @bp_block_users.route("/users/<int:user_id>/unblock", methods=["POST"])
 @login_required

@@ -1,7 +1,8 @@
 {% extends "layout/_base.html" %}
 {% block content %}
 <div class="container">
-  <div class="card">
+  <div class="card"
+       {% if user.blocked %}style="background:#ffe6e6; border:1px solid #ff9b9b;"{% endif %}>
     <h2>Detalls Usuari</h2>
 
     <!-- Avatar amb fallback -->
@@ -20,31 +21,35 @@
         <p><strong>Raó:</strong> {{ user.blocked.reason }}</p>
         <p><strong>Moderador:</strong> {{ user.blocked.moderator.name }}</p>
         <p><small>Creat: {{ user.blocked.created }}</small></p>
-      </div>
 
-      {% if current_user.is_authenticated and current_user.role.name in ["moderator","admin"] %}
-        <form method="POST" action="{{ url_for('block_users.unblock_user', user_id=user.id) }}" style="margin-top:.75rem;">
-          <button type="submit" class="action">Desbloquejar usuari</button>
-        </form>
-      {% endif %}
+        <!-- Desbloquejar només moderator/admin -->
+        {% if current_user.is_authenticated and current_user.role.name in ["moderator","admin"] %}
+          <form method="POST" action="{{ url_for('block_users.unblock_user', user_id=user.id) }}" style="margin-top:.75rem;">
+            <button type="submit" class="action">✅ Desbloquejar usuari</button>
+          </form>
+        {% endif %}
+      </div>
     {% else %}
       <div class="alert" style="background:#e7ffe7; border:1px solid #7aff7a; padding:.75rem; margin-top:1rem;">
         <p><strong>Estat:</strong> No bloquejat</p>
-      </div>
 
-      {% if current_user.is_authenticated and current_user.role.name in ["moderator", "admin"] and user.role.name == "wanner" %}
-        <form method="POST" action="{{ url_for('block_users.block_user', user_id=user.id) }}" style="margin-top:.75rem;">
-          <label for="reason"><strong>Raó del bloqueig:</strong></label>
-          <textarea id="reason" name="reason" rows="3" required style="width:100%; margin:.5rem 0;"></textarea>
-          <button type="submit" class="action danger">Bloquejar usuari</button>
-        </form>
-      {% endif %}
+        <!-- Bloquejar només moderator/admin i si és wanner -->
+        {% if current_user.is_authenticated and current_user.role.name in ["moderator", "admin"] and user.role.name == "wanner" %}
+          <form method="POST" action="{{ url_for('block_users.block_user', user_id=user.id) }}" style="margin-top:.75rem;">
+            <label for="reason"><strong>Raó del bloqueig:</strong></label>
+            <textarea id="reason" name="reason" rows="3" required style="width:100%; margin:.5rem 0;"></textarea>
+            <button type="submit" class="action danger">🚫 Bloquejar usuari</button>
+          </form>
+        {% endif %}
+      </div>
     {% endif %}
 
     <!-- Accions habituals -->
     <div class="actions" style="margin-top:1rem;">
-      <a class="action" href="{{ url_for('users.update_user', id=user.id) }}">📝 Editar</a>
-      <a class="action danger" href="{{ url_for('users.delete_user', id=user.id) }}">🗑️ Eliminar</a>
+      {% if current_user.is_authenticated and current_user.role.name == "admin" %}
+        <a class="action" href="{{ url_for('users.update_user', id=user.id) }}">📝 Editar</a>
+        <a class="action danger" href="{{ url_for('users.delete_user', id=user.id) }}">🗑️ Eliminar</a>
+      {% endif %}
     </div>
   </div>
 

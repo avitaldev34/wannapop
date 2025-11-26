@@ -1,11 +1,14 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request
+from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.security import generate_password_hash, check_password_hash
 from .extensions import db, login_manager
 from .forms import LoginForm, RegisterForm
-from .models import User, Role, BlockedUser   
+from .models import User, Role, BlockedUser
 from werkzeug.utils import secure_filename
 import os
+
+# Importem el helper per establir identitat de rols
+from .helper_role import set_identity_on_login  
 
 bp = Blueprint("auth", __name__, url_prefix="/auth")
 
@@ -44,7 +47,12 @@ def login():
                 flash(f"No pots iniciar sessió: Usuari bloquejat. Raó: {user.blocked.reason}", "danger")
                 return redirect(url_for("auth.login"))
 
+            # Login correcte
             login_user(user)
+
+            # Establim identitat per Flask-Principal
+            set_identity_on_login(current_app, user)
+
             flash("Has iniciat sessió correctament.", "success")
             next_url = request.args.get("next")
             return redirect(next_url or url_for("main.index"))

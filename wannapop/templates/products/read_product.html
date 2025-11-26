@@ -1,7 +1,7 @@
 {% extends "layout/_base.html" %}
 {% block content %}
 <div class="container">
-  <div class="card">
+  <div class="card" {% if product.blocked %}style="background:#ffe6e6; border:1px solid #ff9b9b;"{% endif %}>
     <h1>{{ product.title }}</h1>
 
     <!-- Imatge amb fallback si no hi ha foto -->
@@ -21,46 +21,47 @@
         <p><strong>Raó:</strong> {{ product.blocked.reason }}</p>
         <p><strong>Moderador:</strong> {{ product.blocked.moderator.name }}</p>
         <p><small>Creat: {{ product.blocked.created }}</small></p>
-      </div>
 
-      <!-- Formulari per DESBLOQUEJAR (només moderador/admin) -->
-      {% if current_user.is_authenticated and current_user.role.name in ["moderator", "admin"] %}
-        <form method="POST"
-              action="{{ url_for('block_products.unblock_product', product_id=product.id) }}"
-              class="actions"
-              style="margin-top:.75rem;">
-          <button type="submit" class="action">Desbloquejar</button>
-        </form>
-      {% endif %}
+        <!-- Desbloquejar només moderador/admin -->
+        {% if current_user.is_authenticated and current_user.role.name in ["moderator", "admin"] %}
+          <form method="POST"
+                action="{{ url_for('block_products.unblock_product', product_id=product.id) }}"
+                class="actions"
+                style="margin-top:.75rem;">
+            <button type="submit" class="action">✅ Desbloquejar</button>
+          </form>
+        {% endif %}
+      </div>
     {% else %}
       <div class="alert" style="background:#e7ffe7; border:1px solid #7aff7a; padding:.75rem; margin-top:1rem;">
         <p><strong>Estat:</strong> No bloquejat</p>
-      </div>
 
-      <!-- Formulari per BLOQUEJAR (només moderador/admin) -->
-      {% if current_user.is_authenticated and current_user.role.name in ["moderator", "admin"] %}
-        <form method="POST"
-              action="{{ url_for('block_products.block_product', product_id=product.id) }}"
-              class="actions"
-              style="margin-top:.75rem;">
-          <label for="reason"><strong>Raó del bloqueig:</strong></label>
-          <textarea id="reason" name="reason" rows="3" required style="width:100%; margin:.5rem 0;"></textarea>
-          <button type="submit" class="action danger">Bloquejar</button>
-        </form>
-      {% endif %}
+        <!-- Bloquejar només moderador/admin -->
+        {% if current_user.is_authenticated and current_user.role.name in ["moderator", "admin"] %}
+          <form method="POST"
+                action="{{ url_for('block_products.block_product', product_id=product.id) }}"
+                class="actions"
+                style="margin-top:.75rem;">
+            <label for="reason"><strong>Raó del bloqueig:</strong></label>
+            <textarea id="reason" name="reason" rows="3" required style="width:100%; margin:.5rem 0;"></textarea>
+            <button type="submit" class="action danger">🚫 Bloquejar</button>
+          </form>
+        {% endif %}
+      </div>
     {% endif %}
 
     <!-- Accions habituals -->
     <div class="actions" style="margin-top:1rem;">
-      <a class="action" href="{{ url_for('products.update_product', id=product.id) }}">Editar</a>
-      <a class="action danger" href="{{ url_for('products.delete_product', id=product.id) }}">Eliminar</a>
+      {% if current_user.is_authenticated and (current_user.id == product.seller.id or current_user.role.name == "admin") %}
+        <a class="action" href="{{ url_for('products.update_product', id=product.id) }}">📝 Editar</a>
+        <a class="action danger" href="{{ url_for('products.delete_product', id=product.id) }}">🗑️ Eliminar</a>
+      {% endif %}
     </div>
 
     <!-- Botó per tornar al llistat -->
-    <div class="actions">
+    <div class="actions" style="margin-top:1rem;">
       <a class="action" href="{{ url_for('products.list_products') }}">⬅️ Tornar al llistat de productes</a>
     </div>
-
   </div>
 </div>
 {% endblock %}

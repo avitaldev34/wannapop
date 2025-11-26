@@ -6,6 +6,8 @@ from logging.handlers import RotatingFileHandler
 
 from config import Config
 from .extensions import db, login_manager
+from flask_principal import Principal, identity_loaded, RoleNeed, UserNeed, AnonymousIdentity, Identity
+from flask_login import current_user
 
 # Importem els blueprints 
 from .routes_users import bp_users
@@ -17,6 +19,8 @@ from .routes_block_users import bp_block_users         # blueprint de moderació
 
 toolbar = DebugToolbarExtension()
 migrate = Migrate()
+principals = Principal()
+
 
 def create_app():
     app = Flask(__name__)
@@ -34,6 +38,20 @@ def create_app():
     login_manager.init_app(app)
     login_manager.login_view = "auth.login"
     login_manager.login_message_category = "info"
+    
+    # Flask-Principal
+    principals.init_app(app)
+
+    # 🔑 Carregar identitat en cada request
+    @identity_loaded.connect_via(app)
+    def on_identity_loaded(sender, identity):
+        if current_user.is_authenticated:
+            identity.user = current_user
+            # Afegim el rol actual del usuari
+            if getattr(current_user, "role", None):
+                identity.provides.add(RoleNeed(current_user.role.name))
+            # Afegim també el seu UserNeed
+            identity.provides.add(UserNeed(current_user.id))
 
     # Debug Toolbar (només si està activada a config)
     if app.config.get("DEBUG_TB_ENABLED", False):
