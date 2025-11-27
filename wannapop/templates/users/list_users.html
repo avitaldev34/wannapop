@@ -19,33 +19,32 @@
     </div>
   {% endif %}
 
-  <div class="grid">
+  <div class="list">
     {% for user in users %}
       {% set is_blocked = user.blocked %}
-      {# Si l'usuari està bloquejat, pintem la targeta en vermell #}
-      <div class="card" {% if is_blocked %}style="background:#ffe6e6; border:1px solid #ff9b9b;"{% endif %}>
-        <img src="{{ url_for('static', filename='uploads/' ~ (user.avatar or 'user_default.jpg')) }}"
-             alt="Avatar de {{ user.name }}"
-             style="max-width:120px; display:block; margin:.5rem auto;">
-        <h3>{{ user.name }}</h3>
-        <p>{{ user.email }}</p>
-        <p><strong>Rol:</strong> {{ user.role.name if user.role else "Sense rol" }}</p>
+      <div class="list-item" {% if is_blocked %}style="background:#ffe6e6; border:1px solid #ff9b9b;"{% endif %}>
+        <div style="display:flex; align-items:center; gap:1rem;">
+          <img src="{{ url_for('static', filename='uploads/' ~ (user.avatar or 'user_default.jpg')) }}"
+               alt="Avatar de {{ user.name }}"
+               style="max-width:80px; border-radius:50%;">
+          <div>
+            <h3>{{ user.name }}</h3>
+            <p>{{ user.email }}</p>
+            <p><strong>Rol:</strong> {{ user.role.name if user.role else "Sense rol" }}</p>
+            {% if is_blocked %}
+              <p style="color:#c00;"><strong>Estat:</strong> Bloquejat</p>
+            {% endif %}
+          </div>
+        </div>
 
-        {% if is_blocked %}
-          <p style="color:#c00;"><strong>Estat:</strong> Bloquejat</p>
-        {% endif %}
-
-        <div class="actions">
-          {# Tothom pot veure el detall #}
+        <div class="actions" style="margin-top:.5rem;">
           <a class="action" href="{{ url_for('users.read_user', id=user.id) }}">👁️ Veure</a>
 
-          {# Només admin pot editar i eliminar #}
           {% if current_user.is_authenticated and current_user.role.name == "admin" %}
             <a class="action" href="{{ url_for('users.update_user', id=user.id) }}">📝 Editar</a>
             <a class="action danger" href="{{ url_for('users.delete_user', id=user.id) }}">🗑️ Eliminar</a>
           {% endif %}
 
-          {# Moderador i admin poden bloquejar/desbloquejar #}
           {% if current_user.is_authenticated and current_user.role.name in ["moderator","admin"] %}
             {% if not is_blocked %}
               <form method="POST" action="{{ url_for('block_users.block_user', user_id=user.id) }}" style="display:inline;">

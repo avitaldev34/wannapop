@@ -273,3 +273,32 @@ footer {
     text-align: center;
   }
 }
+
+/* ------------------------------
+   LIST (llistes verticals per usuaris/productes)
+------------------------------ */
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin: 1rem 0;
+}
+
+.list-item {
+  background-color: var(--white);
+  color: var(--dark);
+  border-radius: var(--radius);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  padding: 1rem;
+  transition: background 0.3s ease, box-shadow 0.2s ease;
+}
+
+.list-item:hover {
+  background-color: #f9f9f9;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.list-item img {
+  max-width: 100px;
+  border-radius: var(--radius);
+}
