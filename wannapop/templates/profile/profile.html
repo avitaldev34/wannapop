@@ -4,8 +4,11 @@
   <h2>Perfil d'Usuari</h2>
 
   <div class="card" {% if user.blocked %}style="background:#ffe6e6;"{% endif %}>
+    <!-- Avatar actual -->
     <img src="{{ url_for('static', filename='uploads/' ~ (user.avatar or 'user_default.jpg')) }}"
          alt="Avatar de {{ user.name }}" style="max-width:150px; margin:auto; display:block;">
+
+    <!-- Informació bàsica -->
     <p><strong>Nom:</strong> {{ user.name }}</p>
     <p><strong>Email:</strong> {{ user.email }}</p>
     <p><strong>Rol:</strong> {{ user.role.name }}</p>
@@ -17,16 +20,33 @@
       <p style="color:green;"><strong>Estat:</strong> Actiu</p>
     {% endif %}
 
-    <!-- Formulari per canviar nom i avatar -->
+    <!-- Estat de verificació -->
+    <p>
+      <strong>Verificació correu:</strong>
+      {% if user.verified == 1 %}
+        Correu verificat
+      {% else %}
+        Correu pendent de verificació
+      {% endif %}
+    </p>
+
+    <!-- Formulari per canviar nom, email i avatar -->
     <form method="POST" enctype="multipart/form-data" style="margin-top:1rem;">
       <label for="name">Nou nom:</label>
       <input type="text" id="name" name="name" value="{{ user.name }}">
+
+      <label for="email">Nou correu:</label>
+      <input type="email" id="email" name="email" value="{{ user.email }}">
+      <small>Si canvies el correu, hauràs de verificar-lo de nou.</small>
+
       <label for="avatar">Nou avatar:</label>
       <input type="file" id="avatar" name="avatar">
+
       <button type="submit" class="action">💾 Actualitzar perfil</button>
     </form>
   </div>
 
+  <!-- Productes de l'usuari si és "wanner" -->
   {% if user.role.name == "wanner" %}
     <h3>Els meus productes</h3>
     <div class="grid">

@@ -46,8 +46,16 @@ class User(db.Model, UserMixin):
         cascade="all, delete-orphan"
     )
 
+    # Camps de verificació de correu
+    email_token = db.Column(db.String(100), nullable=True)
+
+    verified = db.Column(db.Integer, nullable=False, default=1)
+
     def __repr__(self):
-        return f"<User id={self.id} name={self.name} email={self.email} role_id={self.role_id}>"
+        return (
+            f"<User id={self.id} name={self.name} email={self.email} "
+            f"role_id={self.role_id} verified={self.verified}>"
+        )
 
 
 # ------------------------------
@@ -87,7 +95,10 @@ class Product(db.Model):
     seller = db.relationship("User", back_populates="products")
 
     def __repr__(self):
-        return f"<Product id={self.id} title={self.title} price={self.price} category_id={self.category_id} seller_id={self.seller_id}>"
+        return (
+            f"<Product id={self.id} title={self.title} price={self.price} "
+            f"category_id={self.category_id} seller_id={self.seller_id}>"
+        )
 
 
 # ------------------------------

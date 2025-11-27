@@ -5,19 +5,46 @@
 
   <!-- Formulari de registre amb WTForms -->
   <form method="POST" enctype="multipart/form-data">
-    {{ form.hidden_tag() }}
+    {{ form.hidden_tag() }}  {# Afegim el token CSRF per seguretat #}
 
-    <p>{{ form.name.label }} {{ form.name }}</p>
-    <p>{{ form.email.label }} {{ form.email }}</p>
-    <p>{{ form.password.label }} {{ form.password }}</p>
+    <!-- Camps bàsics -->
+    <p>
+      {{ form.name.label }}<br>
+      {{ form.name }}
+    </p>
 
-    <p>{{ form.role.label }} {{ form.role }}</p>
+    <p>
+      {{ form.email.label }}<br>
+      {{ form.email }}
+    </p>
 
-    <p>{{ form.avatar.label }} {{ form.avatar }}</p>
+    <p>
+      {{ form.password.label }}<br>
+      {{ form.password }}
+    </p>
 
-    <p>{{ form.submit }}</p>
+    <!-- Selecció de rol -->
+    <p>
+      {{ form.role.label }}<br>
+      {{ form.role }}
+    </p>
+
+    <!-- Avatar opcional -->
+    <p>
+      {{ form.avatar.label }}<br>
+      {{ form.avatar }}
+    </p>
+
+    <!-- Botó de submit -->
+    <p>
+      {{ form.submit }}
+    </p>
   </form>
 
-  <p>Ja tens compte? <a href="{{ url_for('auth.login') }}">Inicia sessió aquí</a></p>
+  <!-- Enllaç a login si ja tens compte -->
+  <p>
+    Ja tens compte?
+    <a href="{{ url_for('auth.login') }}">Inicia sessió aquí</a>
+  </p>
 </div>
 {% endblock %}

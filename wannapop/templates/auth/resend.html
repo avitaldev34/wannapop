@@ -1,0 +1,28 @@
+{% extends "layout/_base.html" %}
+{% block content %}
+<div class="container">
+  <h2>Reenviar correu de verificació</h2>
+
+  <!-- Formulari per demanar reenviament -->
+  <form method="POST">
+    {{ form.hidden_tag() }}  {# Afegim token CSRF si uses WTForms #}
+
+    <p>
+      <label for="email">Introdueix el teu correu electrònic:</label><br>
+      <input type="email" id="email" name="email" required>
+    </p>
+
+    <p>
+      <button type="submit" class="action">📧 Reenviar</button>
+    </p>
+  </form>
+
+  <p class="info">
+    Si encara no has verificat el teu correu, introdueix-lo aquí i rebràs un nou enllaç.
+  </p>
+
+  <p>
+    Ja tens compte verificat? <a href="{{ url_for('auth.login') }}">Inicia sessió aquí</a>
+  </p>
+</div>
+{% endblock %}
